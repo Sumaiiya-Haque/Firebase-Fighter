@@ -3,15 +3,12 @@ import { Link } from "react-router";
 import { FaEye } from "react-icons/fa";
 
 import { IoEyeOff } from "react-icons/io5";
-
-
+import MyContainer from "../Components/MyContainer";
+import  '../index.css';
 
 const SignUp = () => {
+  const handleSignUp = () => {};
 
-const handleSignUp = () => {
-
-} 
-     
   return (
     <div className="min-h-[96vh] flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 relative overflow-hidden">
       {/* Animated floating circles */}
@@ -53,20 +50,14 @@ const handleSignUp = () => {
                   Password
                 </label>
                 <input
-                  type={show ? "text" : "password"}
+                  type=""
                   name="password"
                   placeholder="••••••••"
                   className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
-                <span
-                  onClick={() => setShow(!show)}
-                  className="absolute right-[8px] top-[36px] cursor-pointer z-50"
-                >
-                  {show ? <FaEye /> : <IoEyeOff />}
-                </span>
               </div>
 
-              <button type="submit" className="my-btn">
+              <button className='my-btn' type="submit" className="my-btn">
                 Sign Up
               </button>
 
