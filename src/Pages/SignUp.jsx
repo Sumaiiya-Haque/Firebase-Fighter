@@ -4,10 +4,45 @@ import { FaEye } from "react-icons/fa";
 
 import { IoEyeOff } from "react-icons/io5";
 import MyContainer from "../Components/MyContainer";
-import  '../index.css';
+import "../index.css";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebase.config";
+import { toast } from "react-toastify";
+import { useState } from "react";
 
 const SignUp = () => {
-  const handleSignUp = () => {};
+  const [show, setShow] = useState(false);
+
+  const handleSignUp = (e) => {
+    e.preventDefault();
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    console.log("signup", email, password);
+
+    if (password.length < 6) {
+      toast.error("Password Should be at least 6 digit");
+      return;
+    }
+
+    const passRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passRegex.test(password)) {
+      toast.error("❌ Password must be exactly 6 digits (numbers only).");
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        console.log(res);
+        toast.success("Signup Successfully");
+      })
+      .catch((error) => {
+        console.log(error.message);
+        toast.error(error.message);
+      });
+  };
 
   return (
     <div className="min-h-[96vh] flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 relative overflow-hidden">
@@ -50,14 +85,20 @@ const SignUp = () => {
                   Password
                 </label>
                 <input
-                  type=""
+                  type={show ? "text" : "password"}
                   name="password"
                   placeholder="••••••••"
                   className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
+               <span
+                  onClick={() => setShow(!show)}
+                  className="absolute right-4 top-9 cursor-pointer z-50"
+                >
+                  {show ? <FaEye /> : <IoEyeOff></IoEyeOff>}
+                </span>
               </div>
 
-              <button className='my-btn' type="submit" className="my-btn">
+              <button className="my-btn" type="submit">
                 Sign Up
               </button>
 
