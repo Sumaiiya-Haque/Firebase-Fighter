@@ -25,13 +25,13 @@ const SignUp = () => {
       return;
     }
 
-    const passRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    // const passRegex =
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    if (!passRegex.test(password)) {
-      toast.error("❌ Password must be exactly 6 digits (numbers only).");
-      return;
-    }
+    // if (!passRegex.test(password)) {
+    //   toast.error("❌ Password must be exactly 6 digits (numbers only).");
+    //   return;
+    // }
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((res) => {
