@@ -2,10 +2,11 @@ import { Link } from "react-router";
 import MyContainer from "../Components/MyContainer";
 import { FaEye } from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   GithubAuthProvider,
   GoogleAuthProvider,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -20,6 +21,10 @@ const SignIn = () => {
   const [show, setShow] = useState(false);
   const [user, setUser] = useState(null);
 
+  const emailRef = useRef(null);
+
+  // const [email, setEmail] = useState(null);
+
   const handleSignin = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -29,7 +34,7 @@ const SignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((res) => {
         if (!res.user.emailVerified) {
-          toast.error("Your Email is not Verified.")
+          toast.error("Your Email is not Verified.");
           return;
         }
         console.log(res);
@@ -104,7 +109,19 @@ const SignIn = () => {
       });
   };
 
-  console.log(user);
+  const handleForgetPassword = (e) => {
+    console.log(e.target.email);
+    const email = emailRef.current.value;
+    sendPasswordResetEmail(auth, email)
+      .then((res) => {
+        toast.success("check your email to reset password");
+      })
+      .catch((e) => {
+        toast.error(e.message);
+      });
+  };
+
+  // console.log(user);
 
   return (
     <div className="min-h-[calc(100vh-20px)] flex items-center justify-center bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 relative overflow-hidden">
@@ -154,6 +171,9 @@ const SignIn = () => {
                   <input
                     type="email"
                     name="email"
+                    ref={emailRef}
+                    // value={email}
+                    // onChange={(e)=>setEmail(e.target.value)}
                     placeholder="example@email.com"
                     className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
@@ -174,6 +194,14 @@ const SignIn = () => {
                     {show ? <FaEye /> : <IoEyeOff></IoEyeOff>}
                   </span>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleForgetPassword}
+                  className="hover:underline cursor-pointer"
+                >
+                  Forget Password?
+                </button>
 
                 <button type="submit" className="my-btn">
                   Login
