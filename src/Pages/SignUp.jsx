@@ -5,7 +5,11 @@ import { FaEye } from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
 import MyContainer from "../Components/MyContainer";
 import "../index.css";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -16,30 +20,47 @@ const SignUp = () => {
   const handleSignUp = (e) => {
     e.preventDefault();
 
+    const displayName = e.target.name.value;
+    const photoURL = e.target.photo.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log("signup", email, password);
+
+    console.log("signup", { email, password, displayName, photoURL });
 
     if (password.length < 6) {
       toast.error("Password Should be at least 6 digit");
       return;
     }
 
-    // const passRegex =
-    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    // if (!passRegex.test(password)) {
-    //   toast.error("❌ Password must be exactly 6 digits (numbers only).");
-    //   return;
-    // }
-
+    //1. create user
     createUserWithEmailAndPassword(auth, email, password)
       .then((res) => {
         console.log(res);
-        toast.success("Signup Successfully");
+        //2. update profile
+        updateProfile(res.user, {
+          displayName,
+          photoURL,
+        })
+          .then(() => {
+            //3. email verification
+            sendEmailVerification(res.user)
+              .then((res) => {
+                
+                console.log(res);
+                toast.success(
+                  "SignUp Successfull,Check Your Email to validate Your Account"
+                );
+              })
+              .catch((e) => {
+                toast.error(e.message);
+              });
+          })
+          .catch((e) => {
+            toast.error(e.message);
+          });
       })
       .catch((error) => {
-        console.log(error.message);
+        // console.log(error.message);
         toast.error(error.message);
       });
   };
@@ -70,6 +91,32 @@ const SignUp = () => {
             </h2>
 
             <form onSubmit={handleSignUp} className="space-y-4">
+              {/* name */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Sumaiya Haque"
+                  className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                />
+              </div>
+
+              {/* photo */}
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Photo URL
+                </label>
+                <input
+                  type="text"
+                  name="photo"
+                  placeholder="Your Photo URL here"
+                  className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                />
+              </div>
+
+              {/* email */}
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
                 <input
@@ -90,7 +137,7 @@ const SignUp = () => {
                   placeholder="••••••••"
                   className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
-               <span
+                <span
                   onClick={() => setShow(!show)}
                   className="absolute right-4 top-9 cursor-pointer z-50"
                 >

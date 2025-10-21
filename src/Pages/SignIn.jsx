@@ -4,6 +4,7 @@ import { FaEye } from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
 import { useState } from "react";
 import {
+  GithubAuthProvider,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -13,6 +14,7 @@ import { auth } from "../firebase/firebase.config";
 import { toast } from "react-toastify";
 
 const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
 
 const SignIn = () => {
   const [show, setShow] = useState(false);
@@ -26,18 +28,48 @@ const SignIn = () => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((res) => {
+        if (!res.user.emailVerified) {
+          toast.error("Your Email is not Verified.")
+          return;
+        }
         console.log(res);
         setUser(res.user);
         toast.success("sign in successfull");
       })
       .catch((error) => {
-        console.log(error.message);
-        toast.error(error.message);
+        console.log(error.code, error.message);
+
+        if (error.code === "auth/invalid-email") {
+          toast.error("Please enter a valid email address.");
+        } else if (error.code === "auth/missing-email") {
+          toast.error("Email is required.");
+        } else if (error.code === "auth/missing-password") {
+          toast.error("Password is required.");
+        } else if (error.code === "auth/invalid-credential") {
+          toast.error("Invalid email or password.");
+        } else if (error.code === "auth/user-not-found") {
+          toast.error("No user found with this email. Please sign up first.");
+        } else if (error.code === "auth/wrong-password") {
+          toast.error("Incorrect password. Try again.");
+        } else if (error.code === "auth/too-many-requests") {
+          toast.error("Too many failed attempts. Try again later.");
+        } else if (error.code === "auth/user-disabled") {
+          toast.error("Your account has been disabled. Contact support.");
+        } else if (error.code === "auth/network-request-failed") {
+          toast.error("Network error. Check your internet connection.");
+        } else if (error.code === "auth/invalid-api-key") {
+          toast.error("Invalid API key. Please check your Firebase config.");
+        } else if (error.code === "auth/operation-not-allowed") {
+          toast.error("Email/Password sign-in is disabled in Firebase.");
+        } else {
+          toast.error("Something went wrong. Please try again later.");
+        }
       });
   };
 
   const handleGoogleSignin = () => {
-    signInWithPopup(auth,googleProvider).then((res) => {
+    signInWithPopup(auth, googleProvider)
+      .then((res) => {
         console.log(res);
         setUser(res.user);
         toast.success("sign in successfull");
@@ -55,6 +87,19 @@ const SignIn = () => {
         setUser(null);
       })
       .catch((error) => {
+        toast.error(error.message);
+      });
+  };
+
+  const handleGithubSignin = () => {
+    signInWithPopup(auth, githubProvider)
+      .then((res) => {
+        console.log(res);
+        setUser(res.user);
+        toast.success("sign in successfull");
+      })
+      .catch((error) => {
+        console.log(error.message);
         toast.error(error.message);
       });
   };
@@ -149,6 +194,20 @@ const SignIn = () => {
                 >
                   <img
                     src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="google"
+                    className="w-5 h-5"
+                  />
+                  Continue with Google
+                </button>
+
+                {/* Github signIn */}
+                <button
+                  type="button"
+                  onClick={handleGithubSignin}
+                  className="flex items-center justify-center gap-3 bg-white text-gray-800 px-5 py-2 rounded-lg w-full font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <img
+                    src="https://img.icons8.com/ios-glyphs/30/github.png"
                     alt="google"
                     className="w-5 h-5"
                   />
